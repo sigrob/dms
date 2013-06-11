@@ -17,10 +17,8 @@ NumChannels = 4; % Number of Active Cannels 1-4
 GF = 1.65; %Gauge Factor
 NominalBridgeResistance = 120; %Ohm
 
-mesurementTime = 10; % sec
-SampleRate = 2; % Hz
-
-normalise = 1; % True = 1; False = 0
+mesurementTime = 5; % sec
+SampleRate = 10; % Hz
 
 s = daq.createSession('ni');
 s.addAnalogInputChannel('cDAQ1Mod1', 0:NumChannels-1, 'Bridge');
@@ -37,17 +35,7 @@ s.DurationInSeconds = mesurementTime;
  
 [data,time] = s.startForeground;
 
-if normalise == 1
-    temp = zeros(mesurementTime * SampleRate, NumChannels);
-    for i = 1:NumChannels
-        A = data(1:SampleRate,i);
-        NORM = mean(A);
-        temp(:,i) = data(:,i)-NORM;
-        strain = -4 * temp./ (GF*(1+2*temp));        
-    end
-else   
-    strain = -4 * data./ (GF*(1+2*data));
-end
+strain = -4 * data./ (GF*(1+2*data));
 
 figure;
 plot(time,strain);
