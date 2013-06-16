@@ -17,15 +17,18 @@ NumChannels = 4; % Number of Active Cannels 1-4
 GF = 1.65; %Gauge Factor
 NominalBridgeResistance = 120; %Ohm
 
-mesurementTime = 5; % sec
-SampleRate = 10; % Hz
+mesurementTime = 15; % sec
+SampleRate = 5; % Hz
 
 s = daq.createSession('ni');
 s.addAnalogInputChannel('cDAQ1Mod1', 0:NumChannels-1, 'Bridge');
+
 for n = 1:NumChannels
     s.Channels(n).BridgeMode = 'Quarter';
     s.Channels(n).NominalBridgeResistance = NominalBridgeResistance;
-    s.Channels(n).ADCTimingMode = 'HighSpeed';
+    s.Channels(n).ADCTimingMode = 'Best50HzRejection';
+    %s.Channels(n).ADCTimingMode = 'HighSpeed';
+    %s.Channels(n).Range = [-2.5 2.5];
 end
     
 
@@ -35,7 +38,7 @@ s.DurationInSeconds = mesurementTime;
  
 [data,time] = s.startForeground;
 
-strain = -4 * data./ (GF*(1+2*data));
+strain = -4 * (data)./ (GF*(1+2*data));
 
 figure;
 plot(time,strain);
